@@ -81,10 +81,15 @@ enable_ufw_with_ipsets() {
     update_ufw_rules_with_ipsets
 }
 
-disable_ufw_with_ipsets() {
-    echo "Removing Cloudflare IP sets..."
+destroy_ufw_ipsets() {
     sudo ipset destroy cloudflare_ipv4
     sudo ipset destroy cloudflare_ipv6
+}
+
+
+disable_ufw_with_ipsets() {
+    echo "Removing Cloudflare IP sets..."
+    destroy_ufw_ipsets
     sudo ufw reset
     sudo ufw default accept incoming
     sudo ufw unlimit ssh
