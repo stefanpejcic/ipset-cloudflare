@@ -42,6 +42,7 @@ enable_ufw() {
 }
 
 disable_ufw() {
+    ufw reset
     ufw default accept incoming
     ufw unlimit ssh
     update_ufw_rules
