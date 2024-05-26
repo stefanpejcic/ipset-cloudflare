@@ -174,8 +174,8 @@ enable_ufw() {
 disable_ufw() {
     echo "Disabling UFW without Cloudflare IP sets..."
     #sudo ufw reset
-    sudo ufw default accept incoming
-    sudo ufw unlimit ssh
+    sudo ufw default allow incoming
+    #todo: sudo ufw unlimit ssh
     delete_ufw_rules
     sudo ufw --force enable
     remove_from_cron "0 0 * * 0 root opencli cloudflare --enable" "/etc/cron.d/openpanel"
