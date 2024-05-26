@@ -33,7 +33,6 @@
 set -e
 
 # Ensure curl and command -v ufw >/dev/null 2>&1 || { echo "ufw is required but it's not installed. Aborting." >&2; exit 1; }
-ufw are installed
 command -v curl >/dev/null 2>&1 || { echo "curl is required but it's not installed. Aborting." >&2; exit 1; }
 command -v ufw >/dev/null 2>&1 || { echo "ufw is required but it's not installed. Aborting." >&2; exit 1; }
 
