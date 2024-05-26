@@ -87,6 +87,35 @@ populate_ipsets() {
     unset IFS
 }
 
+
+add_to_cron() {
+    line_to_add="$1"
+    cron_file="$2"
+
+    if grep -q "$line_to_add" "$cron_file"; then
+        echo "Line already exists in $cron_file."
+    else
+        echo "$line_to_add" >> "$cron_file"
+        echo "Line added successfully to $cron_file."
+    fi
+}
+
+
+remove_from_cron() {
+    line_to_remove="$1"
+    cron_file="$2"
+
+    if grep -q "$line_to_remove" "$cron_file"; then
+        temp_file=$(mktemp)
+        grep -v "$line_to_remove" "$cron_file" > "$temp_file"
+        mv "$temp_file" "$cron_file"
+        echo "Line removed successfully from $cron_file."
+    else
+        echo "Line does not exist in $cron_file."
+    fi
+}
+
+
 update_ufw_rules_with_ipsets() {
     # Clear existing rules
     sudo ufw reset
@@ -101,6 +130,9 @@ update_ufw_rules_with_ipsets() {
 
     # Enable UFW
     sudo ufw --force enable
+
+    # delete cron
+    add_to_cron "0 0 * * 0 root opencli cloudflare --enable-ipset" "/etc/cron.d/openpanel"
 }
 
 enable_ufw_with_ipsets() {
@@ -124,24 +156,31 @@ disable_ufw_with_ipsets() {
     sudo ufw default accept incoming
     sudo ufw unlimit ssh
     sudo ufw --force enable
+    remove_from_cron "0 0 * * 0 root opencli cloudflare --enable-ipset" "/etc/cron.d/openpanel"
 }
+
+
+
 
 enable_ufw() {
     echo "Enabling UFW without Cloudflare IP sets..."
-    sudo ufw reset
+    #sudo ufw reset
     sudo ufw default reject incoming
     sudo ufw limit ssh
     allow_cloudflare_ips
     sudo ufw --force enable
+    add_to_cron "0 0 * * 0 root opencli cloudflare --enable" "/etc/cron.d/openpanel"
 }
 
 disable_ufw() {
     echo "Disabling UFW without Cloudflare IP sets..."
-    sudo ufw reset
+    #sudo ufw reset
     sudo ufw default accept incoming
     sudo ufw unlimit ssh
     delete_ufw_rules
     sudo ufw --force enable
+    remove_from_cron "0 0 * * 0 root opencli cloudflare --enable" "/etc/cron.d/openpanel"
+
 }
 
 # Main
